@@ -1,0 +1,17 @@
+{
+  "include": [
+    "."
+  ],
+  "extraPaths": [
+    "."
+  ],
+  "typeCheckingMode": "off",
+  "reportMissingImports": "none",
+  "reportOptionalCall": "none",
+  "reportOptionalMemberAccess": "none",
+  "reportAttributeAccessIssue": "none",
+  "reportPossiblyUnboundVariable": "none",
+  "reportArgumentType": "none",
+  "reportCallIssue": "none",
+  "reportGeneralTypeIssues": "none"
+}

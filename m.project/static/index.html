@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VisionStory AI | Context-Aware Image-to-Story Generation</title>
+  <meta name="description" content="AI Image-to-Story Generator using PyTorch vision preprocessing, object/scene understanding, and structured literary generation with relevance scoring.">
+  
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="dark-theme">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand">
+        <div class="logo-icon">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">VisionStory <span class="badge-ai">AI</span></span>
+          <span class="brand-subtitle">Deep Learning &bull; PyTorch &bull; Context-Aware Narratives</span>
+        </div>
+      </div>
+
+      <nav class="nav-tabs">
+        <button class="nav-btn active" data-tab="studio-tab">
+          <i class="fa-solid fa-compass-drafting"></i> Studio
+        </button>
+        <button class="nav-btn" data-tab="library-tab">
+          <i class="fa-solid fa-book-bookmark"></i> Story Library
+        </button>
+      </nav>
+
+    </div>
+  </header>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="main-content">
+
+    <!-- ==================== TAB 1: STUDIO ==================== -->
+    <section id="studio-tab" class="tab-view active">
+      <div class="studio-grid">
+        
+        <!-- LEFT COLUMN: INPUTS & ML CONTROLS -->
+        <div class="control-panel">
+
+          <!-- 1. IMAGE UPLOAD & PRESET SAMPLES -->
+          <div class="card glass-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-cloud-arrow-up text-accent"></i> 1. Image Source</h3>
+              <span class="badge-pill">PyTorch Ingestion</span>
+            </div>
+
+            <!-- Drag & Drop Zone -->
+            <div id="dropZone" class="drop-zone">
+              <input type="file" id="imageFileInput" accept="image/jpeg,image/png,image/webp" class="file-input" />
+              <div class="drop-content">
+                <i class="fa-solid fa-image drop-icon"></i>
+                <p class="drop-title">Drag &amp; drop your image here</p>
+                <p class="drop-sub">JPG, PNG, or WEBP (Max 20MB)</p>
+                <button type="button" id="browseBtn" class="btn-outline btn-sm">
+                  <i class="fa-solid fa-folder-open"></i> Browse Files
+                </button>
+              </div>
+              <div id="imagePreviewContainer" class="image-preview-container hidden">
+                <img id="imagePreview" alt="Selected Preview" />
+                <button type="button" id="removeImageBtn" class="remove-btn" title="Remove image">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Quick Preset Samples -->
+            <div class="preset-section">
+              <div class="preset-header">
+                <span>Or select a test benchmark sample:</span>
+              </div>
+              <div class="preset-chips" id="presetChipsContainer">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. STORY DIRECTIVES & PARAMETERS -->
+          <div class="card glass-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-sliders text-accent"></i> 2. Story Directives</h3>
+            </div>
+
+            <form id="storyControlsForm" class="controls-form">
+              <!-- Genre Selection -->
+              <div class="form-group">
+                <label for="genreSelect"><i class="fa-solid fa-masks-theater"></i> Literary Genre</label>
+                <div class="custom-select-wrap">
+                  <select id="genreSelect" class="form-control">
+                    <option value="Adventure" selected>Adventure (Exploration &amp; Quest)</option>
+                    <option value="Mystery">Mystery (Enigma &amp; Hidden Clues)</option>
+                    <option value="Fantasy">Fantasy (Mythical &amp; Enchanted)</option>
+                    <option value="Sci-Fi">Sci-Fi (Futuristic &amp; Cosmic)</option>
+                    <option value="Inspirational">Inspirational (Courage &amp; Resilience)</option>
+                    <option value="Romance">Romance (Tender &amp; Nostalgic)</option>
+                    <option value="Horror">Horror / Gothic (Shadows &amp; Dread)</option>
+                    <option value="Comedy">Comedy (Whimsical &amp; Lighthearted)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Length & Tone Grid -->
+              <div class="form-row">
+                <div class="form-group col-half">
+                  <label for="lengthSelect"><i class="fa-solid fa-ruler-horizontal"></i> Story Length</label>
+                  <select id="lengthSelect" class="form-control">
+                    <option value="Short">Short (~250 words)</option>
+                    <option value="Medium" selected>Medium (~500 words)</option>
+                    <option value="Long">Long (~800 words)</option>
+                  </select>
+                </div>
+
+                <div class="form-group col-half">
+                  <label for="toneSelect"><i class="fa-solid fa-music"></i> Narrative Tone</label>
+                  <select id="toneSelect" class="form-control">
+                    <option value="Emotional" selected>Emotional &amp; Deep</option>
+                    <option value="Suspenseful">Suspenseful &amp; Tense</option>
+                    <option value="Whimsical">Whimsical &amp; Light</option>
+                    <option value="Dramatic">Dramatic &amp; Grand</option>
+                    <option value="Poetic">Poetic &amp; Lyrical</option>
+                    <option value="Inspiring">Inspiring &amp; Triumphant</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Ending Style & Character Customization -->
+              <div class="form-row">
+                <div class="form-group col-half">
+                  <label for="endingSelect"><i class="fa-solid fa-flag-checkered"></i> Story Ending</label>
+                  <select id="endingSelect" class="form-control">
+                    <option value="Happy" selected>Happy &amp; Fulfilling</option>
+                    <option value="Unexpected">Unexpected Twist</option>
+                    <option value="Open-ended">Open-ended / Thoughtful</option>
+                    <option value="Bittersweet">Bittersweet &amp; Moving</option>
+                  </select>
+                </div>
+
+                <div class="form-group col-half">
+                  <label for="customCharInput"><i class="fa-solid fa-user-pen"></i> Protagonist Name (Optional)</label>
+                  <input type="text" id="customCharInput" class="form-control" placeholder="e.g. Arjun, Maya, Kael" />
+                </div>
+              </div>
+
+              <!-- GENERATE ACTION BUTTON -->
+              <button type="button" id="generateStoryBtn" class="btn-primary btn-block">
+                <span class="btn-text"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate Context-Aware Story</span>
+                <span class="btn-loader hidden"><i class="fa-solid fa-circle-notch fa-spin"></i> Synthesizing Narrative...</span>
+              </button>
+            </form>
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: GENERATED STORY OUTPUT -->
+        <div class="story-output-panel">
+          
+          <!-- EMPTY STATE (Before Story Generation) -->
+          <div id="emptyStoryPlaceholder" class="empty-state card glass-card">
+            <div class="empty-art">
+              <i class="fa-solid fa-book-open-reader"></i>
+            </div>
+            <h2>Your Story Awaits Creation</h2>
+            <p>Upload any picture or pick one of our sample benchmarks. VisionStory AI will extract its visual semantics and weave a rich, contextual narrative complete with characters, chapters, dialogue, and a relevance score.</p>
+            <div class="empty-features">
+              <div class="ef-item"><i class="fa-solid fa-check text-success"></i> PyTorch Feature Extraction</div>
+              <div class="ef-item"><i class="fa-solid fa-check text-success"></i> 4-Act Literary Structure</div>
+              <div class="ef-item"><i class="fa-solid fa-check text-success"></i> Audio Narration (TTS)</div>
+              <div class="ef-item"><i class="fa-solid fa-check text-success"></i> PDF Storybook Export</div>
+            </div>
+          </div>
+
+          <!-- ACTIVE STORY CARD (Visible after generation) -->
+          <div id="storyResultCard" class="card glass-card story-card hidden">
+            
+            <!-- STORY HEADER -->
+            <div class="story-header">
+              <div class="story-title-wrap">
+                <div class="genre-pill-wrap">
+                  <span id="storyGenreBadge" class="genre-tag">Adventure</span>
+                  <span id="storyToneBadge" class="tone-tag">Emotional</span>
+                  <span id="storyEndingBadge" class="ending-tag">Happy Ending</span>
+                </div>
+                <h1 id="storyTitle" class="story-title">The Secret of the Golden Horizon</h1>
+                <p id="storySceneMeta" class="story-scene-meta"><i class="fa-solid fa-location-dot"></i> Coastal Shoreline / Beach</p>
+              </div>
+
+              <!-- ACTION TOOLBAR -->
+              <div class="story-toolbar">
+                <button id="btnTTSPlay" class="tool-btn" title="Listen to Story Narration">
+                  <i class="fa-solid fa-volume-high"></i> <span id="ttsBtnText">Listen</span>
+                </button>
+                <button id="btnExportPDF" class="tool-btn" title="Download PDF Storybook">
+                  <i class="fa-solid fa-file-pdf"></i> PDF Book
+                </button>
+                <button id="btnEditStory" class="tool-btn" title="Edit &amp; Regenerate">
+                  <i class="fa-solid fa-pen-to-square"></i> Edit
+                </button>
+                <button id="btnSaveFavorite" class="tool-btn" title="Favorite">
+                  <i class="fa-regular fa-bookmark"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- AUDIO PLAYER BAR (Conditional) -->
+            <div id="audioPlayerBar" class="audio-bar hidden">
+              <div class="audio-controls">
+                <button id="audioPauseBtn" class="audio-btn"><i class="fa-solid fa-pause"></i></button>
+                <button id="audioStopBtn" class="audio-btn"><i class="fa-solid fa-stop"></i></button>
+                <span class="audio-status" id="audioStatusText">Playing narration...</span>
+              </div>
+              <div class="voice-selector-wrap">
+                <label for="voiceSelect"><i class="fa-solid fa-user-voice"></i> Voice:</label>
+                <select id="voiceSelect" class="voice-select"></select>
+                <label for="rateSlider">Speed:</label>
+                <input type="range" id="rateSlider" min="0.7" max="1.3" step="0.1" value="1.0" class="rate-slider">
+              </div>
+            </div>
+
+            <!-- RELEVANCE SCORE ACCORDION / BANNER -->
+            <div class="relevance-banner" id="relevanceBanner">
+              <div class="score-circle-wrap">
+                <div class="score-number" id="relevanceScoreVal">93.5%</div>
+                <span class="score-label">Visual Relevance</span>
+              </div>
+              <div class="score-info">
+                <div class="score-tier" id="relevanceTier">High Visual Fidelity</div>
+                <p class="score-summary" id="relevanceSummary">The narrative seamlessly links 4 detected visual elements with environment and mood.</p>
+                <div class="score-metrics-row">
+                  <div class="score-bar-item">
+                    <span>Entity Recall: <b id="scoreEntityFidelity">95%</b></span>
+                    <div class="mini-progress"><div class="mini-fill" id="barEntity" style="width: 95%"></div></div>
+                  </div>
+                  <div class="score-bar-item">
+                    <span>Scene Setting: <b id="scoreSceneAlignment">92%</b></span>
+                    <div class="mini-progress"><div class="mini-fill" id="barScene" style="width: 92%"></div></div>
+                  </div>
+                  <div class="score-bar-item">
+                    <span>Atmosphere: <b id="scoreThematic">94%</b></span>
+                    <div class="mini-progress"><div class="mini-fill" id="barThematic" style="width: 94%"></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- DRAMATIS PERSONAE (CHARACTERS) -->
+            <div class="characters-container">
+              <h4 class="section-title"><i class="fa-solid fa-users text-accent"></i> Dramatis Personae</h4>
+              <div class="characters-grid" id="charactersList">
+                <!-- Character cards injected here -->
+              </div>
+            </div>
+
+            <!-- CHAPTERS SECTION -->
+            <div class="chapters-container" id="chaptersContainer">
+              <!-- Chapters injected here -->
+            </div>
+
+            <!-- KEY DIALOGUES -->
+            <div class="dialogue-container" id="dialogueContainer">
+              <h4 class="section-title"><i class="fa-solid fa-comments text-accent"></i> Key Dialogues</h4>
+              <div class="dialogue-list" id="dialogueList">
+                <!-- Dialogue quotes injected here -->
+              </div>
+            </div>
+
+            <!-- MORAL / TAKEAWAY -->
+            <div class="moral-container" id="moralContainer">
+              <div class="moral-icon"><i class="fa-solid fa-feather-pointed"></i></div>
+              <div class="moral-text-wrap">
+                <span class="moral-label">Moral of the Tale</span>
+                <p id="moralText" class="moral-text">"Every sunset carries the promise of a dawn..."</p>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+
+
+    <!-- ==================== TAB 3: STORY LIBRARY ==================== -->
+    <section id="library-tab" class="tab-view">
+      <div class="library-header">
+        <div>
+          <h2><i class="fa-solid fa-book-bookmark text-accent"></i> Story Library &amp; History</h2>
+          <p>Browse previously generated stories, revisit their visual analysis, or download them as illustrated PDF storybooks.</p>
+        </div>
+        <div class="library-search-wrap">
+          <input type="text" id="librarySearch" class="form-control" placeholder="Search saved stories..." />
+        </div>
+      </div>
+
+      <div class="library-grid" id="libraryGrid">
+        <!-- Stories injected here -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- EDIT / REGENERATE MODAL -->
+  <div id="editStoryModal" class="modal-backdrop hidden">
+    <div class="modal-card glass-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-pen-nib text-accent"></i> Edit Story Parameters</h3>
+        <button id="closeEditModal" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="editStoryForm">
+          <div class="form-group">
+            <label for="editGenreSelect">Genre</label>
+            <select id="editGenreSelect" class="form-control">
+              <option value="Adventure">Adventure</option>
+              <option value="Mystery">Mystery</option>
+              <option value="Fantasy">Fantasy</option>
+              <option value="Sci-Fi">Sci-Fi</option>
+              <option value="Inspirational">Inspirational</option>
+              <option value="Romance">Romance</option>
+              <option value="Horror">Horror</option>
+              <option value="Comedy">Comedy</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label for="editToneSelect">Tone</label>
+              <select id="editToneSelect" class="form-control">
+                <option value="Emotional">Emotional</option>
+                <option value="Suspenseful">Suspenseful</option>
+                <option value="Whimsical">Whimsical</option>
+                <option value="Dramatic">Dramatic</option>
+                <option value="Poetic">Poetic</option>
+                <option value="Inspiring">Inspiring</option>
+              </select>
+            </div>
+            <div class="form-group col-half">
+              <label for="editEndingSelect">Ending</label>
+              <select id="editEndingSelect" class="form-control">
+                <option value="Happy">Happy</option>
+                <option value="Unexpected">Unexpected</option>
+                <option value="Open-ended">Open-ended</option>
+                <option value="Bittersweet">Bittersweet</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="editCharName">Protagonist Name</label>
+            <input type="text" id="editCharName" class="form-control" placeholder="Change character name..." />
+          </div>
+          <div class="modal-actions">
+            <button type="button" id="cancelEditBtn" class="btn-secondary">Cancel</button>
+            <button type="submit" id="saveRegenerateBtn" class="btn-primary">Regenerate Story</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main JavaScript -->
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
